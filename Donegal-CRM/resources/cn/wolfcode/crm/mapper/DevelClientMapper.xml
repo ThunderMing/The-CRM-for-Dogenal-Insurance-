@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.DevelClientMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.DevelClient">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="result" jdbcType="VARCHAR" property="result" />
+    <result column="planTime" jdbcType="DATE" property="planTime" />
+    <result column="planTheme" jdbcType="VARCHAR" property="planTheme" />
+    <result column="mode" jdbcType="VARCHAR" property="mode" />
+    <result column="details" jdbcType="VARCHAR" property="details" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="status" jdbcType="BIT" property="status" />
+    <result column="follow_upTime" jdbcType="DATE" property="follow_upTime" />
+    <result column="follow_upTheme" jdbcType="VARCHAR" property="follow_upTheme" />
+
+
+    <association property="foundEmpl" javaType="employee" columnPrefix="found_">
+      <id column="id" property="id"/>
+      <result property="username" column="username"/>
+    </association>
+   
+    <association property="client" javaType="client" columnPrefix="c_">
+      <id column="id" property="id"/>
+      <result property="name" column="name"/>
+    </association>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from develclient
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into develclient (result, planTime, foundEmpl_id, 
+      client_id, planTheme, mode, 
+      details, remark, status, 
+      follow_upTime, follow_upTheme)
+    values (#{result}, #{planTime}, #{foundEmpl.id}, 
+      #{client.id}, #{planTheme}, #{mode}, 
+      #{details}, #{remark}, #{status}, 
+      #{follow_upTime}, #{follow_upTheme})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update develclient
+    set result = #{result},
+    <if test="status == false">
+      planTheme = #{planTheme},
+      planTime = #{planTime},
+    </if>
+      client_id = #{client.id},
+      mode = #{mode},
+      details = #{details},
+      remark = #{remark}
+    <if test="status == true">
+      ,follow_upTime = #{follow_upTime},
+      follow_upTheme = #{follow_upTheme}
+    </if>
+    where id = #{id}
+  </update>
+
+  <update id="updateResult">
+    update develclient set
+    result = #{result}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, result, planTime, foundEmpl_id, client_id, planTheme, mode, details, remark, 
+    status, follow_upTime, follow_upTheme
+    from develclient
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, result, planTime, foundEmpl_id, client_id, planTheme, mode, details, remark, 
+    status, follow_upTime, follow_upTheme
+    from develclient
+  </select>
+
+ 
+1.React Native Developer
+
+Desired Skills and Experience *
+Sr Java Developer
+1+ years of react native experience
+JavaScript
+*Senior position must have stood up different Azure cloud deployments
+Plusses
+Mobile development experience with IOs or Android
+Day-to-Day *
+A large global retailer in the Northwest Arkansas area is looking for a React Native Developer to join an engineering team on the international division of the organization. This team will be rewriting legacy applications into a mobile cloud stack. They will be coding and building services from scratch. As well as taking exiting code and modifying it. Experience standing up different cloud deployments with various markets would be preferred!
+
+ 
+
+2. Full Stack with React Native
+
+Desired Skills and Experience *
+React Native
+Java 8 development
+Day-to-Day *
+A large global retailer is looking for a Full-stack Java Developer. This candidate will be helping transform old mobile applications written in C to React Native.
+
+ 
+
+3. Back End Developer
+
+Desired Skills and Experience *
+Java 8
+Kafka
+Restful APIs
+Spring Boot
+  <select id="queryForCount" resultType="int" >
+    select count(*)
+    <include refid="base_table"/>
+    where dc.status = #{status}
+    <if test="biginTime != null">
+      and dc.planTime &gt; #{biginTime}
+    </if>
+    <if test="endTime != null">
+      and dc.planTime &lt; #{endTime}
+    </if>
+    <if test="queryClientName != null">
+      and c.name like concat('%',#{queryClientName},'%')
+    </if>
+    <if test="foundEmpl != null">
+      and found.username like concat('%',#{foundEmpl},'%')
+    </if>
+    <if test="planTheme != null">
+      and planTheme like concat('%',#{planTheme},'%')
+    </if>
+    <if test="mode != null">
+      and dc.mode like concat ('%',#{mode},'%')
+    </if>
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    <include refid="base_column"/>
+    <include refid="base_table"/>
+    where dc.status = #{status}
+    <if test="biginTime != null">
+      and dc.planTime &gt; #{biginTime}
+    </if>
+    <if test="endTime != null">
+      and dc.planTime &lt; #{endTime}
+    </if>
+    <if test="queryClientName != null">
+      and c.name like concat('%',#{queryClientName},'%')
+    </if>
+    <if test="foundEmpl != null">
+      and found.username like concat('%',#{foundEmpl},'%')
+    </if>
+    <if test="planTheme != null">
+      and planTheme like concat('%',#{planTheme},'%')
+    </if>
+    <if test="mode != null">
+      and dc.mode like concat ('%',#{mode},'%')
+    </if>
+    limit #{start},#{rows}
+  </select>
+
+  <sql id="base_column">
+    select dc.id, dc.result, dc.planTime,dc.planTheme,
+    dc.follow_upTime, dc.follow_upTheme,
+    dc.mode, dc.details, dc.remark, dc.status,
+    found.id found_id,found.username found_username,
+    c.id c_id,c.name c_name
+  </sql>
+  <sql id="base_table">
+    from develClient dc join employee found
+    on dc.foundEmpl_id = found.id
+    join client c on c.id = dc.client_id
+  </sql>
+
+  <sql id="base_where">
+    <where>
+      <if test="biginTime != null">
+        and dc.planTime &gt; #{biginTime}
+      </if>
+      <if test="endTime != null">
+        and dc.planTime &lt; #{endTime}
+      </if>
+      <if test="queryClientName != null">
+        and c.name like concat('%',#{queryClientName},'%')
+      </if>
+      <if test="foundEmpl != null">
+        and found.username like concat('%',#{foundEmpl},'%')
+      </if>
+      <if test="planTheme != null">
+        and planTheme like concat('%',#{planTheme},'%')
+      </if>
+      <if test="mode != null">
+        and dc.mode like concat ('%',#{mode},'%')
+      </if>
+    </where>
+  </sql>
+
+</mapper>

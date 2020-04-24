@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.InsuranceMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.Insurance">
+    <id column="id" property="id" />
+    <result column="applysn" property="applysn" />
+    <result column="applytime" property="applytime" />
+    <result column="amount" property="amount" />
+    <result column="audittime" property="audittime" />
+    <result column="paytype" property="paytype" />
+    <result column="paystatus" property="paystatus" />
+    <result column="billsn" property="billsn" />
+    <result column="starttime" property="starttime" />
+    <result column="endtime" property="endtime" />
+    <result column="billstatus" property="billstatus" />
+    <result column="message" property="message" />
+
+      <association property="client" javaType="client" columnPrefix="c_">
+          <id column="id" property="id" />
+          <result column="name" property="name" />
+          <result column="sex" property="sex" />
+          <result column="phone" property="phone" />
+          <result column="address" property="address" />
+          <result column="clientId" property="clientId" />
+      </association>
+  
+      <association property="car" javaType="carMessage" columnPrefix="cm_">
+          <id column="id" property="id" />
+          <result column="name" property="name" />
+          <result column="username" property="username" />
+          <result column="sn" property="sn" />
+          <result column="carNumber" property="carNumber" />
+          <result column="carExhaust" property="carExhaust" />
+          <result column="buyDate" property="buyDate" />
+          <result column="marketPrice" property="marketPrice" />
+          <result column="classify" property="classify" />
+          <result column="carTyoe" property="carTyoe" />
+      </association>
+
+      <association property="inputer" javaType="employee" columnPrefix="in_">
+          <id column="id" property="id" />
+          <result column="realname" property="realname" />
+      </association>
+  
+      <association property="auditor" javaType="employee" columnPrefix="au_">
+          <id column="id" property="id" />
+          <result column="realname" property="realname" />
+      </association>
+   
+      <collection property="products" column="id" fetchType="eager"
+                  select="cn.wolfcode.crm.mapper.ProductInformationMapper.selectByInsuranceId"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from insurance
+    where id = #{id}
+  </delete>
+    <delete id="deleteProductRelation">
+        delete from insurance_product where insurance_id = #{insuranceId}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into
+    insurance (client_id, car_id, applysn, applytime,amount,billstatus, inputer_id)
+    values
+    (#{client.id}, #{car.id}, #{applysn}, #{applytime},#{amount},#{billstatus}, #{inputer.id})
+  </insert>
+
+    <insert id="insertProductRelation">
+      insert into insurance_product (insurance_id, product_id) values (#{insuranceId}, #{productId})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update insurance
+    set client_id = #{client.id},
+      car_id = #{car.id},
+      amount = #{amount},
+      billstatus = #{billstatus}
+    where applysn = #{applysn}
+  </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, client_id, car_id, applysn, applytime,amount, audittime,
+    paytype, paystatus, billsn, starttime, endtime, billstatus, inputer_id, auditor_id, message
+    from insurance
+    where id = #{id}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+    select id, client_id, car_id, applysn, applytime, amount, audittime,
+    paytype, paystatus, billsn, starttime, endtime, billstatus, inputer_id, auditor_id,
+    message
+    from insurance
+  </select>
+    <select id="queryForCount" resultType="int">
+        select count(*)
+        <include refid="base_table"/>
+        <include refid="base_where"/>
+    </select>
+    <select id="queryForList" resultMap="BaseResultMap">
+    select id, client_id, car_id, applysn, applytime, amount, audittime,
+    paytype, paystatus, billsn, starttime, endtime, billstatus, inputer_id, auditor_id,
+    message
+    from insurance
+    limit #{start},#{rows}
+  </select>
+  
+    <select id="selectByInsuranceAutit" resultMap="BaseResultMap">
+        <include refid="base_column"/>
+        <include refid="base_table"/>
+        <include refid="base_where"/>
+    </select>
+
+    <update id="rollbackOrPass">
+        update insurance set billstatus=#{billStatus} where id=#{insurecId}
+    </update>
+
+    <update id="updateByMessager">
+        update insurance set message=#{massager} where id=#{ingId}
+    </update>
+
+  
+    <select id="selectPayInfoState" resultMap="BaseResultMap">
+        <include refid="base_column"/>
+        <include refid="base_table"/>
+        where i.paystatus = #{paystatus}
+        <if test="minDate != null">
+            and i.applytime &gt; #{minDate}
+        </if>
+        <if test="maxDate != null">
+            and i.applytime &lt; #{maxDate}
+        </if>
+        <if test="proId > 0">
+            and ip.product_id in(
+            select id from product where organization_id = #{proId})
+        </if>
+    </select>
+    <update id="updateBillStatus">
+        update insurance set
+          billstatus = #{billstatus}
+          where id = #{id}
+    </update>
+
+    <sql id="base_where">
+        <where>
+            <if test="minDate != null">
+                and i.applytime &gt; #{minDate}
+            </if>
+            <if test="maxDate != null">
+                and i.applytime &lt; #{maxDate}
+            </if>
+            <if test="proId > 0">
+                and ip.product_id in(
+                select id from product where organization_id = #{proId})
+            </if>
+            <if test="billstatus = -1">
+                and (i.billstatus = 2 or i.billstatus = 5)
+            </if>
+        </where>
+    </sql>
+
+    <sql id="base_table">
+        	 from
+            insurance i
+            left join insurance_product ip on i.id = ip.insurance_id
+            left join product p on p.id = ip.product_id
+            left join client c on c.id = i.client_id
+            left join car cm on cm.id = i.car_id
+    </sql>
+
+    <sql id="base_column">
+        select
+        i.id,	i.client_id,	i.car_id, i.paytype,i.paystatus,i.billsn,
+        i.starttime,i.endtime,i.billstatus,i.inputer_id,i.audittime,
+        i.applysn,	i.applytime,	i.amount,i.message,
+        p.id p_id,	p.name p_name,
+        p.organizationName p_organizationName,
+        p.organization_id p_organization_id,
+        cm.id cm_id, cm.username cm_username,cm.name cm_name,cm.sn cm_sn,cm.carNumber cm_carNumber,cm.carExhaust cm_carExhaust,
+        cm.buyDate cm_buyDate,cm.marketPrice cm_marketPrice,cm.classify cm_classify,cm.carTyoe cm_carTyoe,cm.remark cm_remark,
+        c.id c_id,c.name c_name,c.sex c_sex,c.clientId c_clientId,c.address c_address
+    </sql>
+
+        <select id="queryWaitAndEditForCount" resultType="int">
+        select count(*)
+        <include refid="base_table"/>
+        <include refid="base_where"/>
+    </select>
+    <select id="queryWaitAndEditForList" resultMap="BaseResultMap">
+        <include refid="waitAndEdit_column"/>
+        <include refid="base_table"/>
+        <include refid="WaitAndEdit_where"/>
+        limit #{start},#{rows}
+    </select>
+    <update id="changeAsRollback">
+        update insurance set billstatus=1 where id =#{id}
+    </update>
+    <update id="changeAsAudit">
+        update insurance set billstatus=2 where id =#{id}
+    </update>
+    <sql id="waitAndEdit_column">
+        select
+        i.id,	i.client_id,	i.car_id, i.paytype,i.paystatus,i.billsn,
+        i.starttime,i.endtime,i.billstatus,i.inputer_id,i.audittime,
+        i.applysn,	i.applytime,	i.amount,i.message,
+        p.id p_id,	p.name p_name,
+        p.organizationName p_organizationName,
+        p.organization_id p_organization_id,
+        cm.id cm_id, cm.username cm_username,cm.name cm_name,cm.sn cm_sn,cm.carNumber cm_carNumber,cm.carExhaust cm_carExhaust,
+        cm.buyDate cm_buyDate,cm.marketPrice cm_marketPrice,cm.classify cm_classify,cm.carTyoe cm_carTyoe,cm.remark cm_remark,
+        c.id c_id,c.name c_name,c.sex c_sex,c.clientId c_clientId,c.address c_address
+    </sql>
+
+
+    <sql id="WaitAndEdit_where">
+        <where>
+            <if test="minDate != null">
+                and i.applytime &gt; #{minDate}
+            </if>
+            <if test="maxDate != null">
+                and i.applytime &lt; #{maxDate}
+            </if>
+            <if test="proId > 0">
+                and ip.product_id in(
+                select id from product where organization_id = #{proId})
+            </if>
+            <choose>
+               <when test="state > 0">
+                   and billstatus = #{state}
+               </when>
+                <otherwise>
+                    and (i.billstatus = 1 or i.billstatus = 2 or i.billstatus = 3)
+                </otherwise>
+            </choose>
+
+        </where>
+    </sql>
+
+
+    
+    <select id="selectCostInfo" resultMap="BaseResultMap">
+        <include refid="base_cost_cloum"/>
+        <include refid="base_cost_table"/>
+        <include refid="base_cost_where"/>
+    </select>
+    <select id="queryCostForCount" resultType="int">
+        select count(*)
+        <include refid="base_cost_table"/>
+        <include refid="base_cost_where"/>
+    </select>
+    <select id="queryCostForList" resultMap="BaseResultMap">
+        <include refid="base_cost_cloum"/>
+        <include refid="base_cost_table"/>
+        <include refid="base_cost_where"/>
+        limit #{start},#{rows}
+    </select>
+    <sql id="base_cost_cloum">
+        select i.id,i.paytype, i.paystatus, i.billsn, i.starttime , i.endtime ,
+        i.billstatus , i.applysn, i.applytime, i.amount, i.audittime,i.message,i.applysn  ,i.amount,
+        c.name c_name,c.phone c_phone,c.address c_address,c.clientId c_clientId,
+        ein.realname in_realname,
+        eau.realname au_realname
+    </sql>
+    <sql id="base_cost_table">
+        from insurance i
+        JOIN client c  on i.client_id=c.id
+        JOIN employee ein on i.inputer_id=ein.id
+        JOIN employee eau on i.auditor_id=eau.id
+    </sql>
+    <sql id="base_cost_where">
+        <where>
+            <if test="keyword!=null">
+                and (c.name like concat('%',#{keyword},'%'))
+            </if>
+            <if test="applysn!=null">
+                and (i.applysn like concat('%',#{applysn},'%'))
+            </if>
+            <if test="begin!=null">
+                and i.starttime &lt;=#{begin}
+            </if>
+            <if test="end!=null">
+                and i.endtime &lt;=#{end}
+            </if>
+            <if test="paystatus>=0">
+                and i.paystatus=#{paystatus}
+            </if>
+        </where>
+    </sql>
+    
+    <select id="selectPayInfo" resultMap="BaseResultMap">
+        <include refid="base_pay_cloum"/>
+        <include refid="base_pay_table"/>
+        <include refid="base_pay_where"/>
+    </select>
+    <update id="changeState">
+        update insurance set paystatus=0 where id =#{id}
+    </update>
+    <select id="queryPayForCount" resultType="int">
+        select count(*)
+        <include refid="base_pay_table"/>
+        <include refid="base_pay_where"/>
+    </select>
+    <select id="queryPayForList" resultMap="BaseResultMap">
+        <include refid="base_pay_cloum"/>
+        <include refid="base_pay_table"/>
+        <include refid="base_pay_where"/>
+        limit #{start},#{rows}
+    </select>
+    <select id="selectByPrimaryKeyForCase" resultMap="BaseResultMap">
+        <include refid="base_column"/>
+        <include refid="base_table"/>
+        where i.id = #{id}
+    </select>
+
+    <sql id="base_pay_cloum">
+        select i.id,i.paytype, i.paystatus, i.billsn, i.starttime , i.endtime ,
+        i.billstatus , i.applysn, i.applytime, i.amount, i.audittime,i.message,i.applysn  ,i.amount,
+        c.name c_name,c.phone c_phone,c.address c_address,c.clientId c_clientId,
+        ein.realname in_realname,
+        eau.realname au_realname
+    </sql>
+    <sql id="base_pay_table">
+        from insurance i
+        JOIN client c  on i.client_id=c.id
+        JOIN employee ein on i.inputer_id=ein.id
+        JOIN employee eau on i.auditor_id=eau.id
+    </sql>
+    <sql id="base_pay_where">
+        <where>
+            <if test="keyword!=null">
+                and (c.name like concat('%',#{keyword},'%'))
+            </if>
+            <if test="applytime!=null">
+                and i.applytime &lt;=#{applytime}
+            </if>
+            <if test="payState>=0">
+                and i.paystatus=#{payState}
+            </if>
+        </where>
+    </sql>
+
+</mapper>

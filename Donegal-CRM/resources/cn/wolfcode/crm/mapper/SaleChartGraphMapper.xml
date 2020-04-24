@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.SaleChartGraphMapper">
+    <select id="saleByBar" resultType="map" parameterType="CRM_Dogenal.Donegal_CRM.query.SalesChartQueryObject">
+
+    </select>
+    <select id="saleByPie" resultType="map" parameterType="CRM_Dogenal.Donegal_CRM.query.SalesChartQueryObject">
+
+    </select>
+</mapper>

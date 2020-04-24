@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.SalaryMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.Salary">
+    <id column="id" property="id" />
+    <result column="salary" property="salary" />
+    <result column="bouns" property="bouns" />
+    <result column="balancedate" property="balancedate" />
+    <result column="totalsalary" property="totalsalary" />
+    <result column="latecount" property="latecount" />
+    <result column="emp_id" property="empId" />
+    <result column="empName" property="empName" />
+    <result column="empTel" property="empTel" />
+    <result column="empEmail" property="empEmail" />
+    <result column="dept_id" property="deptId" />
+    <result column="deptName" property="deptName" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from salary
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into salary (salary, bouns, balancedate, totalsalary, latecount, emp_id,
+      empName,empTel,empEmail,dept_id,deptName)
+    values (#{salary}, #{bouns}, #{balancedate}, #{totalsalary}, #{latecount}, #{empId},
+   #{empName},#{empTel},#{empEmail},#{deptId},#{deptName})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update salary
+    set salary = #{salary},
+      bouns = #{bouns},
+      balancedate = #{balancedate},
+      totalsalary = #{totalsalary},
+      latecount = #{latecount},
+      emp_id = #{empId},
+      empName = #{empName},
+      empTel = #{empTel},
+      empEmail = #{empEmail},
+      dept_id = #{deptId},
+      deptName = #{deptName}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select * from salary where id = #{salaryId}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from salary
+  </select>
+  <select id="queryForCount" resultType="int" >
+    select count(*) from salary
+    <include refid="base_where"/>
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    select * from salary
+    <include refid="base_where"/>
+    limit #{start},#{rows}
+  </select>
+  <sql id="base_where">
+    <where>
+      <if test="keyword != null">
+        AND empName like concat('%',#{keyword},'%')
+      </if>
+      <if test="dept != null">
+        AND deptName = #{dept}
+      </if>
+      <if test="minDate != null">
+        and balancedate &gt;= #{minDate}
+      </if>
+      <if test="maxDate != null">
+        and balancedate &lt;= #{maxDate}
+      </if>
+    </where>
+  </sql>
+</mapper>

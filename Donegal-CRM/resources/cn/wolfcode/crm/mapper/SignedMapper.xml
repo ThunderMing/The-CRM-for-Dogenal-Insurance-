@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.SignedMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.Signed">
+    <id column="id" property="id" />
+    <result column="check_time" property="checkTime" />
+    <result column="emp_realname" property="empRealname" />
+    <result column="dept_name" property="deptName" />
+    <result column="start_work" property="startWork" />
+    <result column="off_work" property="offWork" />
+    <result column="state" property="state" />
+    <result column="emp_id" property="empId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from signed
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into signed (check_time, emp_realname, dept_name, start_work, off_work, state,emp_id
+      )
+    values (#{checkTime}, #{empRealname}, #{deptName}, #{startWork}, #{offWork}, #{state},#{empId}
+      )
+  </insert>
+  <update id="updateOffWork">
+    update signed
+    set check_time = #{checkTime},
+      emp_realname = #{empRealname},
+      dept_name = #{deptName},
+      start_work = #{startWork},
+      off_work = #{offWork},
+      state = #{state},
+      emp_id = #{empId}
+    where check_time = #{checkTime} and emp_id = #{empId}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, check_time, emp_realname, dept_name, start_work, off_work, state,emp_id
+    from signed
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, check_time, emp_realname, dept_name, start_work, off_work, state,emp_id
+    from signed
+  </select>
+
+  <select id="selectStartwork" resultMap="BaseResultMap">
+    select id, check_time, emp_realname, dept_name, start_work, off_work, state,emp_id
+    from signed where emp_id = #{empId} and check_time = #{checkTime}
+  </select>
+  <select id="queryForCount" resultType="int" >
+    select count(*) from signed
+    <include refid="base_where"/>
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    select * from signed
+    <include refid="base_where"/>
+    limit #{start},#{rows}
+  </select>
+  <select id="selectAllLateCount" resultType="int">
+    select count(*) from signed
+    WHERE DATE_FORMAT(check_time,'%Y-%m') = DATE_FORMAT(#{checkTime},'%Y-%m')
+     AND emp_realname = #{empRealname} AND state = 0
+  </select>
+  <sql id="base_where">
+    <where>
+      <if test="keyword != null">
+        AND emp_realname like concat('%',#{keyword},'%')
+      </if>
+      <if test="dept != null">
+        AND dept_name = #{dept}
+      </if>
+      <if test="minDate != null">
+        and check_time &gt;= #{minDate}
+      </if>
+      <if test="maxDate != null">
+        and check_time &lt;= #{maxDate}
+      </if>
+    </where>
+  </sql>
+</mapper>

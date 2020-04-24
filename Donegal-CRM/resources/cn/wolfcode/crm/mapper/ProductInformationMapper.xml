@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.ProductInformationMapper">
+    <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.ProductInformation">
+        <id column="id" property="id"/>
+        <result column="sn" property="sn"/>
+        <result column="name" property="name"/>
+        <result column="ageLimit" property="ageLimit"/>
+        <result column="coverage" property="coverage"/>
+        <result column="annualFee" property="annualFee"/>
+        <result column="saleStatus" property="saleStatus"/>
+        <result column="deductionStatus" property="deductionStatus"/>
+        <result column="organizationName" property="organizationName"/>
+        <result column="organization_id" property="organizationId"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+    delete from product
+    where id = #{id}
+  </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into product (sn, name, ageLimit, coverage, annualFee, saleStatus, organization_id,organizationName,deductionStatus)
+   values (#{sn}, #{name}, #{ageLimit}, #{coverage}, #{annualFee}, #{saleStatus},#{organizationId},#{organizationName},
+      #{deductionStatus})
+  </insert>
+    <update id="updateByPrimaryKey">
+    update product
+    set sn = #{sn},
+      name = #{name},
+      ageLimit = #{ageLimit},
+      coverage = #{coverage},
+      annualFee = #{annualFee},
+      saleStatus = #{saleStatus},
+      deductionStatus = #{deductionStatus},
+      organizationName = #{organizationName},
+      organization_id = #{organizationId}
+    where id = #{id}
+  </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        <include refid="base_cloum"/>
+        <include refid="base_table"/>
+        where p.id = #{id}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+      SELECT  id,name FROM product
+    </select>
+
+
+    <select id="queryForCount" resultType="int">
+        select count(*)
+        <include refid="base_table"/>
+        <include refid="base_where"/>
+    </select>
+ 
+    <select id="queryForList" resultMap="BaseResultMap">
+        <include refid="base_cloum"/>
+        <include refid="base_table"/>
+        <include refid="base_where"/>
+        limit #{start},#{rows}
+    </select>
+
+ 
+    <sql id="base_cloum">
+       select o.name o_name,o.id o_id,o.sn o_sn,
+       p.id, p.sn, p.name, p.ageLimit, p.coverage, p.annualFee, p.saleStatus, p.deductionStatus,p.organizationName,p.organization_id
+      </sql>
+    
+    <sql id="base_table">
+    from product p LEFT JOIN organization o ON p.organization_id = o.id
+  </sql>
+  
+    <sql id="base_where">
+        <where>
+            <if test="keyword != null">
+                and (p.name like concat('%',#{keyword},'%') or p.sn like concat('%',#{keyword},'%'))
+            </if>
+            <if test="saleStatus >= 0">
+                and p.saleStatus = #{saleStatus}
+            </if>
+            <if test="deductionStatus >= 0">
+                and p.deductionStatus = #{deductionStatus}
+            </if>
+        </where>
+    </sql>
+
+
+    <select id="selectByOranication" resultMap="BaseResultMap">
+        <include refid="base_cloum"/>
+        <include refid="base_table"/>
+        where p.organization_id = #{organitionId}
+    </select>
+
+    <select id="selectByInsuranceId" resultMap="BaseResultMap">
+        select p.id, p.sn, p.name, p.ageLimit, p.coverage, p.annualFee, p.saleStatus, p.deductionStatus,p.organizationName,p.organization_id
+        from product p
+        left join insurance_product ip on p.id = ip.product_id
+        where ip.insurance_id = #{insuranId}
+    </select>
+
+</mapper>

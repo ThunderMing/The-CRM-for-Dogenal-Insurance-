@@ -1,0 +1,17 @@
+[{
+	"id":1,
+	"text":"",
+	"children":[{
+		"id":11,
+		"text":"",
+		"url":"/employee/view.do"
+	},{
+		"id":12,
+		"text":"",
+		"url":"/department/view.do"
+	},{
+		"id":13,
+		"text":"",
+		"url":"/role/view.do"
+	}]
+}]

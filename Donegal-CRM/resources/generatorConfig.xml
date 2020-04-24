@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="mysql" defaultModelType="hierarchical" targetRuntime="MyBatis3Simple">
+        <property name="useActualColumnNames" value="true" />
+        
+        <property name="autoDelimitKeywords" value="false"/>
+        
+        <property name="javaFileEncoding" value="UTF-8"/>
+
+        
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+       
+
+        
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/Donegal_CRM?serverTimezone=UTC" userId="root" password="root">
+            
+        </jdbcConnection>
+
+        
+        <javaModelGenerator targetPackage="cn.wolfcode.crm.domain" targetProject="src/main/java">
+            
+            <property name="constructorBased" value="false"/>
+            
+            <property name="immutable" value="false"/>
+        </javaModelGenerator>
+
+
+      
+            targetPackage/targetProject:javaModelGenerator -->
+        <sqlMapGenerator targetPackage="CRM_Dogenal/Donegal_CRM/mapper"
+                         targetProject="src/main/resources">
+            
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        
+        <javaClientGenerator targetPackage="CRM_Dogenal.Donegal_CRM.mapper"
+                             type="XMLMAPPER" targetProject="src/main/java">
+            
+            <property name="enableSubPackages" value="true"/>
+
+            
+        </javaClientGenerator>
+        
+        <table tableName="develClient" domainObjectName="develClient">
+            <property name="useActualColumnNames" value="true" />
+            
+            <property name="constructorBased" value="false"/>
+            <generatedKey column="id" sqlStatement="JDBC"/>
+        </table>
+    </context>
+</generatorConfiguration>

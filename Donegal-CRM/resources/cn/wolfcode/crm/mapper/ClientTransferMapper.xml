@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.ClientTransferMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.ClientTransfer">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="transferTime" jdbcType="DATE" property="transferTime" />
+    <result column="operationEmpl" jdbcType="VARCHAR" property="operationEmpl" />
+    <result column="clientName" jdbcType="VARCHAR" property="clientName" />
+    <result column="originallyEmpl" jdbcType="VARCHAR" property="originallyEmpl" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+
+       <association property="newEmpl" javaType="employee" columnPrefix="newEmpl_">
+      <id column="id" property="id" />
+      <result column="username"  property="username" />
+    </association>
+  </resultMap>
+
+
+  <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into clienttransfer (transferTime, operationEmpl, clientName, 
+      originallyEmpl, newEmpl_id, reason
+      )
+    values (#{transferTime}, #{operationEmpl}, #{clientName}, 
+      #{originallyEmpl}, #{newEmpl.id}, #{reason}
+      )
+  </insert>
+
+
+  <select id="queryForList" resultMap="BaseResultMap">
+    select ct.id, ct.transferTime, ct.operationEmpl,
+      ct.clientName, ct.originallyEmpl, ct.reason,
+      newEmpl.id newEmpl_id,newEmpl.username newEmpl_username
+    from clienttransfer ct join employee newEmpl on ct.newEmpl_id = newEmpl.id
+    <include refid="base_where"/>
+    limit #{start},#{rows}
+  </select>
+
+  <select id="queryForCount" resultType="int">
+    select count(*) from clienttransfer ct join
+      employee newEmpl on ct.newEmpl_id = newEmpl.id
+    <include refid="base_where"/>
+  </select>
+
+  <sql id="base_where">
+    <where>
+      <if test="biginTime != null">
+        and ct.transferTime &gt; #{biginTime}
+      </if>
+      <if test="endTime != null">
+        and ct.transferTime &lt; #{endTime}
+      </if>
+      <if test="operationEmpl != null">
+        and ct.operationEmpl like concat('%',#{operationEmpl},'%')
+      </if>
+      <if test="clientName != null">
+        and ct.clientName like concat ('%',#{clientName},'%')
+      </if>
+      <if test="originallyEmpl != null">
+        and ct.originallyEmpl like concat ('%',#{originallyEmpl},'%')
+      </if>
+      <if test="newEmpl != null">
+        and ct.newEmpl.username = like concat ('%',#{newEmpl},'%')
+      </if>
+    </where>
+  </sql>
+</mapper>

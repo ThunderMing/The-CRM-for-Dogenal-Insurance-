@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.OrganizationMapper">
+    <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.Organization">
+        <id column="id" property="id"/>
+        <result column="sn" property="sn"/>
+        <result column="name" property="name"/>
+        <result column="legalPerson" property="legalPerson"/>
+        <result column="idcar" property="idcar"/>
+        <result column="tel" property="tel"/>
+        <result column="location" property="location"/>
+        <result column="saleStatus" property="saleStatus"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+    delete from organization
+    where id = #{id}
+  </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into organization (sn, name, legalPerson, idcar, tel, location,
+      saleStatus)
+    values (#{sn}, #{name}, #{legalPerson}, #{idcar}, #{tel}, #{location},
+      #{saleStatus})
+  </insert>
+    <update id="updateByPrimaryKey">
+    update organization
+    set sn = #{sn},
+      name = #{name},
+      legalPerson = #{legalPerson},
+      idcar = #{idcar},
+      tel = #{tel},
+      location = #{location},
+      saleStatus = #{saleStatus}
+    where id = #{id}
+  </update>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, sn, name, legalPerson, idcar, tel, location, saleStatus
+    from organization
+    where id = #{id}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+    select id, sn, name, legalPerson, idcar, tel, location, saleStatus
+    from organization
+  </select>
+
+
+ 
+    <select id="queryForCount" resultType="int">
+        select count(*) from organization o
+        <include refid="base_where"/>
+    </select>
+   
+    <select id="queryForList" resultMap="BaseResultMap">
+        select o.id, o.sn, o.name, o.legalPerson, o.idcar, o.tel, o.location, o.saleStatus
+        from organization o
+        <include refid="base_where"/>
+        limit #{start},#{rows}
+    </select>
+
+
+    <sql id="base_where">
+        <where>
+            <if test="keyword != null">
+                and (o.name like concat('%',#{keyword},'%') or o.sn like concat('%',#{keyword},'%'))
+            </if>
+            <if test="saleStatus >= 0">
+                and o.saleStatus = #{saleStatus}
+            </if>
+        </where>
+    </sql>
+
+  
+    <select id="selectByProductInformationId" resultType="Organization">
+    SELECT	o.name
+    FROM	organization o JOIN organization_productInformation op ON o.id = op.organization_id
+    WHERE	op.productInformation_id = #{organizationId}
+  </select>
+</mapper>

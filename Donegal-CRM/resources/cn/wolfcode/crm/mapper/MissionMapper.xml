@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.MissionMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.Mission">
+    <id column="id" property="id" />
+    <result column="date" property="date" />
+    <result column="name" property="name" />
+    <result column="dept" property="dept" />
+    <result column="mission_id" property="missionId" />
+    <result column="state" property="state" />
+    <result column="place" property="place" />
+    <result column="info" property="info" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from mission
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into mission (date, name, dept, mission_id, state, place, info)
+    values (#{date}, #{name}, #{dept}, #{missionId}, #{state}, #{place}, #{info})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update mission
+    set date = #{date},
+      name = #{name},
+      dept = #{dept},
+      mission_id = #{missionId},
+      state = #{state},
+      place = #{place},
+      info = #{info}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, date, name, dept, mission_id, state,place,info
+    from mission
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, date, name, dept, mission_id, state,mplace,info
+    from mission
+  </select>
+  <update id="changeState">
+    update mission set state = 1 where id = #{id}
+  </update>
+  <select id="queryForCount" resultType="int" >
+    select count(*) from mission <include refid="base_where"/>
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    select id, date, name, dept, mission_id, state,place,info
+    from mission
+    <include refid="base_where"/>
+    limit #{start},#{rows}
+  </select>
+  <sql id="base_where">
+    <where>
+      <if test="keyword != null">
+        AND name like concat('%',#{keyword},'%')
+      </if>
+      <if test="dept != null">
+        AND dept = #{dept}
+      </if>
+      <if test="minDate != null">
+        and date &gt;= #{minDate}
+      </if>
+      <if test="maxDate != null">
+        and date &lt;= #{maxDate}
+      </if>
+    </where>
+  </sql>
+</mapper>

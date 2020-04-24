@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.ClientMapper">
+    <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.Client">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        <result column="sex" property="sex"/>
+        <result column="salaryLevel" property="salaryLevel"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="address" property="address"/>
+        <result column="source" property="source"/>
+        <result column="qq" property="qq"/>
+        <result column="weChat" property="weChat"/>
+        <result column="clientId" property="clientId"/>
+        <result column="job" property="job"/>
+        <result column="biginDate" property="biginDate"/>
+        <result column="state" property="state"/>
+     
+        <association property="foundEmpl" columnPrefix="found_" javaType="employee">
+            <id column="id" property="id"/>
+            <result property="username" column="username"/>
+        </association>
+      
+        <association property="dutyEmpl" columnPrefix="duty_" javaType="employee">
+            <id column="id" property="id"/>
+            <result property="username" column="username"/>
+        </association>
+    </resultMap>
+    <delete id="deleteByPrimaryKey">
+    delete from client
+    where id = #{id}
+  </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into client (name, age, sex, salaryLevel, 
+      email, phone, address, 
+      source, qq, weChat, 
+      clientId, job, biginDate, 
+      state, foundEmpl_id, dutyEmpl_id
+      )
+    values (#{name}, #{age}, #{sex}, #{salaryLevel}, 
+      #{email}, #{phone}, #{address}, 
+      #{source}, #{qq}, #{weChat}, 
+      #{clientId}, #{job}, #{biginDate}, 
+      #{state}, #{foundEmpl.id}, #{dutyEmpl.id}
+      )
+  </insert>
+    <update id="updateByPrimaryKey">
+    update client
+    set name = #{name},
+      age = #{age},
+      sex = #{sex},
+      salaryLevel = #{salaryLevel},
+      email = #{email},
+      phone = #{phone},
+      address = #{address},
+      source = #{source},
+      qq = #{qq},
+      weChat = #{weChat},
+      clientId = #{clientId},
+      job = #{job},
+      state = #{state}
+    where id = #{id}
+  </update>
+    <update id="updateByPrimaryKey1">
+    update client
+    set name = #{name},
+      age = #{age},
+      sex = #{sex},
+      salaryLevel = #{salaryLevel},
+      email = #{email},
+      phone = #{phone},
+      address = #{address},
+      source = #{source},
+      qq = #{qq},
+      weChat = #{weChat},
+      clientId = #{clientId},
+      job = #{job},
+      state = #{state}
+    where id = #{id}
+  </update>
+    <update id="updateByPrimaryKey2">
+    update client
+    set name = #{name},
+      age = #{age},
+      sex = #{sex},
+      salaryLevel = #{salaryLevel},
+      email = #{email},
+      phone = #{phone},
+      address = #{address},
+      source = #{source},
+      qq = #{qq},
+      weChat = #{weChat},
+      clientId = #{clientId},
+      job = #{job},
+      state = #{state}
+    where id = #{id}
+  </update>
+
+    
+    <select id="selectByState" resultMap="BaseResultMap">
+        <include refid="base_column"/>
+        <include refid="base_table"/>
+        where c.state = 1
+        <if test="keyword != null">
+            and (c.name like concat('%',#{keyword},'%')
+            or c.clientId like concat('%',#{keyword},'%')
+            or c.email like concat('%',#{keyword},'%'))
+        </if>
+        <if test="biginTime != null">
+            and c.biginDate &lt; #{biginTime}
+        </if>
+        <if test="endTime != null">
+            and c.biginDate &gt; #{endTime}
+        </if>
+        <if test="phone != null">
+            and c.phone = #{phone}
+        </if>
+        <if test="clientId != null">
+            and c.clientId = #{clientId}
+        </if>
+        <if test="dutyEmplName != null ">
+            and duty.username like concat('%',#{dutyEmplName},'%')
+        </if>
+        limit #{start},#{rows}
+    </select>-->
+
+    <select id="selectByClient" resultMap="BaseResultMap">
+        select * from client where id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        <include refid="base_column"/>
+        <include refid="base_table"/>
+    </select>
+
+
+    <update id="updateByState">
+        update client set state = #{state},
+          dutyEmpl_id = #{dutyEmpl.id},
+          biginDate = #{biginDate}
+        where id = #{id}
+    </update>
+
+
+    <update id="updateByMoveResouce">
+        update client set state = #{state},
+          biginDate = #{biginDate}
+        where id = #{id}
+    </update>
+
+
+    <select id="queryForCount" resultType="int">
+        select count(*)
+        <include refid="base_table"/>
+        where c.state = #{state}
+        <if test="keyword != null">
+            and (c.name like concat('%',#{keyword},'%')
+            or c.clientId like concat('%',#{keyword},'%')
+            or c.email like concat('%',#{keyword},'%'))
+        </if>
+        <if test="biginTime != null">
+            and c.biginDate &gt; #{biginTime}
+        </if>
+        <if test="endTime != null">
+            and c.biginDate &lt; #{endTime}
+        </if>
+        <if test="phone != null">
+            and c.phone = #{phone}
+        </if>
+        <if test="clientId != null">
+            and c.clientId = #{clientId}
+        </if>
+        <if test="dutyEmplName != null ">
+            and duty.username like concat('%',#{dutyEmplName},'%')
+        </if>
+    </select>
+
+    <select id="queryForList" resultMap="BaseResultMap">
+        <include refid="base_column"/>
+        <include refid="base_table"/>
+        where c.state = #{state}
+        <if test="keyword != null">
+            and (c.name like concat('%',#{keyword},'%')
+            or c.clientId like concat('%',#{keyword},'%')
+            or c.email like concat('%',#{keyword},'%'))
+        </if>
+        <if test="biginTime != null">
+            and c.biginDate &gt; #{biginTime}
+        </if>
+        <if test="endTime != null">
+            and c.biginDate &lt; #{endTime}
+        </if>
+        <if test="phone != null">
+            and c.phone = #{phone}
+        </if>
+        <if test="clientId != null">
+            and c.clientId = #{clientId}
+        </if>
+        <if test="dutyEmplName != null ">
+            and duty.username like concat('%',#{dutyEmplName},'%')
+        </if>
+        limit #{start},#{rows}
+    </select>
+
+ 
+    <update id="updateDutyEmpl" parameterType="client">
+        update client set
+          dutyEmpl_id = #{dutyEmpl.id}
+        where id=#{id}
+    </update>
+
+    <sql id="base_column">
+     select c.id, c.name, c.age, c.sex, c.salaryLevel, c.email,
+		c.phone, c.address, c.source, c.qq, c.weChat,
+        c.clientId, c.job, c.biginDate, c.state,
+		found.id found_id,found.username found_username,
+		duty.id duty_id,duty.username duty_username
+  </sql>
+    <sql id="base_table">
+     from client c join employee found on c.foundEmpl_id = found.id
+      join employee duty on duty.id = c.dutyEmpl_id
+  </sql>
+
+    <sql id="base_where">
+        <where>
+            <if test="keyword != null">
+                and (c.name like concat('%',#{keyword},'%')
+                or c.clientId like concat('%',#{keyword},'%')
+                or c.email like concat('%',#{keyword},'%'))
+            </if>
+            <if test="biginTime != null">
+                and c.biginDate &gt; #{biginTime}
+            </if>
+            <if test="endTime != null">
+                and c.biginDate &lt; #{endTime}
+            </if>
+            <if test="phone != null">
+                and c.phone = #{phone}
+            </if>
+            <if test="clientId != null">
+                and c.clientId = #{clientId}
+            </if>
+            <if test="dutyEmplName != null ">
+                and duty.username like concat('%',#{dutyEmplName},'%')
+            </if>
+        </where>
+    </sql>
+</mapper>

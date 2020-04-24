@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.MenuMapper">
+  <resultMap id="BaseResultMap" type="cn.wolfcode.crm.domain.Menu">
+    <id column="id" property="id" />
+    <result column="text" property="text" />
+    <result column="url" property="url" />
+    <association property="parent" javaType="menu" columnPrefix="p_">
+      <id column="id" property="id" />
+      <result column="text" property="text" />
+    </association>
+    <collection property="children" ofType="menu" column="id" fetchType="eager"
+                select="CRM_Dogenal.Donegal_CRM.mapper.MenuMapper.selectChildrenMenu"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from menu
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into menu (text, url, parent_id)
+    values (#{text}, #{url}, #{parent_id})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update menu
+    set text = #{text},
+      url = #{url},
+      parent_id = #{parent_id}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, text, url, parent_id
+    from menu
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select m.id, m.text, m.url, p.text p_text,p.id p_id
+    from menu m JOIN menu p on m.parent_id=p.id
+  </select>
+
+ 
+  <select id="selectRootMenu" resultMap="BaseResultMap">
+    select * from menu where parent_id is null
+  </select>
+ 
+  <select id="selectChildrenMenu" resultMap="BaseResultMap">
+    select * from menu where parent_id = #{id}
+  </select>
+  <select id="selectByRoleId" resultType="long">
+    select menu_id from role_menu where role_id = #{roleId}
+  </select>
+    <select id="seleByEmployeeId" resultType="long">
+      select m.id
+      from menu m
+      join role_menu rm on m.id = rm.menu_id
+      join employee_role er on er.role_id = rm.role_id
+      where er.employee_id = #{employeeId}
+    </select>
+</mapper>

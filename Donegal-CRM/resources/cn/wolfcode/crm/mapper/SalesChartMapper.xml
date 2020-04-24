@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.SalesChartMapper">
+
+    <select id="salesChartQuery" resultType="map">
+            SELECT
+					${groupType} groupType,
+					sum(i.amount) totalAmount
+            FROM  insurance i
+            JOIN employee e on i.inputer_id=e.id
+				  JOIN insurance_product ip on i.id=ip.insurance_id
+				  JOIN product p on ip.product_id=p.id
+            <include refid="base_where"/>
+            GROUP BY groupType
+    </select>
+    <sql id="base_where">
+        <where>
+            <if test="beginDate!=null">
+               and i.starttime &lt;=#{beginDate}
+            </if>
+            <if test="endDate!=null">
+               and i.endtime &lt;=#{endDate}
+            </if>
+            <if test="safetymechanismId>0">
+               and p.organization_id=#{safetymechanismId}
+            </if>
+            <if test="productId>0">
+               and p.id=#{productId}
+            </if>
+            <if test="paystatus==0">
+                and i.paystatus=#{paystatus}
+            </if>
+        </where>
+    </sql>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.DictionaryDirMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.DictionaryDir">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="sn" property="sn" />
+    <result column="intro" property="intro" />
+    <collection property="items" column="sn" fetchType="eager"
+                select="CRM_Dogenal.Donegal_CRM.mapper.DictionaryDirItemMapper.selectByDirSn"/>
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from dictionarydir
+    where id = #{id}
+  </delete>
+    <delete id="deleteByItemRelation">
+      delete from dictionarydiritem where dir_id = #{dirId}
+    </delete>
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into dictionarydir (name, sn, intro)
+    values (#{name}, #{sn}, #{intro})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update dictionarydir
+    set name = #{name},
+      sn = #{sn},
+      intro = #{intro}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, name, sn, intro
+    from dictionarydir
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, name, sn, intro
+    from dictionarydir
+  </select>
+  <select id="queryForCount" resultType="int" >
+    select count(*) from dictionarydir
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    select id, name, sn, intro
+    from dictionarydir
+    limit #{start},#{rows}
+  </select>
+  <select id="selectBySn" resultType="dictionaryDir">
+    select id, name, sn from dictionarydir where sn = #{sn}
+  </select>
+</mapper>

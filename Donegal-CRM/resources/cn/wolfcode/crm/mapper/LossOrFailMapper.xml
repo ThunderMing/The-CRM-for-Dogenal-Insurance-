@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.LossOrFailMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.LossOrFail">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="lossOrFailTime" jdbcType="DATE" property="lossOrFailTime" />
+    <result column="clientName" jdbcType="VARCHAR" property="clientName" />
+    <result column="dutyEmpl" jdbcType="VARCHAR" property="dutyEmpl" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="state" jdbcType="BIT" property="state" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+  </resultMap>
+  <insert id="insert" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+    insert into lossorfail (lossOrFailTime, clientName, dutyEmpl, 
+      reason, state, phone)
+    values (#{lossOrFailTime}, #{clientName}, #{dutyEmpl}, 
+      #{reason}, #{state}, #{phone})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update lossorfail set
+     state = #{state}
+    where id = #{id}
+  </update>
+
+  
+  <select id="queryForList" resultMap="BaseResultMap">
+    select id, lossOrFailTime, clientName, dutyEmpl, reason, state, phone
+    from lossorfail
+    where state = #{state}
+    <if test="biginTime != null">
+      and lossOrFailTime &gt; #{biginTime}
+    </if>
+    <if test="endTime != null">
+      and lossOrFailTime &lt; #{endTime}
+    </if>
+    <if test="clientName != null">
+      and clientName like concat ('%',#{clientName},'%')
+    </if>
+    <if test="dutyEmpl != null">
+      and dutyEmpl like concat ('%',#{dutyEmpl},'%')
+    </if>
+  </select>
+
+  <select id="queryForCount" resultType="int">
+    select count(*) from lossorfail
+    <include refid="base_where"/>
+  </select>
+
+  <sql id="base_where">
+    <where>
+      <if test="biginTime != null">
+        and lossOrFailTime &gt; #{biginTime}
+      </if>
+      <if test="endTime != null">
+        and lossOrFailTime &lt; #{endTime}
+      </if>
+      <if test="clientName != null">
+        and clientName like concat ('%',#{clientName},'%')
+      </if>
+      <if test="dutyEmpl != null">
+        and dutyEmpl like concat ('%',#{dutyEmpl},'%')
+      </if>
+    </where>
+  </sql>
+
+</mapper>

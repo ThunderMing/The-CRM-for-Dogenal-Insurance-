@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.CarMessageMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.CarMessage">
+    <id column="id" property="id" />
+    <result column="username" property="username" />
+    <result column="name" property="name" />
+    <result column="sn" property="sn" />
+    <result column="carNumber" property="carNumber" />
+    <result column="carExhaust" property="carExhaust" />
+    <result column="buyDate" property="buyDate" />
+    <result column="marketPrice" property="marketPrice" />
+    <result column="classify" property="classify" />
+    <result column="carTyoe" property="carTyoe" />
+    <result column="remark" property="remark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey">
+    delete from car
+    where id = #{id}
+  </delete>
+  <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+    insert into car (username, name, sn, carNumber, carExhaust, buyDate, marketPrice, 
+      classify, carTyoe, remark)
+    values (#{username}, #{name}, #{sn}, #{carNumber}, #{carExhaust}, #{buyDate}, #{marketPrice}, 
+      #{classify}, #{carTyoe}, #{remark})
+  </insert>
+  <update id="updateByPrimaryKey">
+    update car
+    set username = #{username},
+      name = #{name},
+      sn = #{sn},
+      carNumber = #{carNumber},
+      carExhaust = #{carExhaust},
+      buyDate = #{buyDate},
+      marketPrice = #{marketPrice},
+      classify = #{classify},
+      carTyoe = #{carTyoe},
+      remark = #{remark}
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+    select id, username, name, sn, carNumber, carExhaust, buyDate, marketPrice, classify, 
+    carTyoe, remark
+    from car
+    where id = #{id}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, username, name, sn, carNumber, carExhaust, buyDate, marketPrice, classify, 
+    carTyoe, remark
+    from car
+  </select>
+
+ 
+  <select id="queryForCount" resultType="int">
+    select count(*) from car c
+    <include refid="base_where"/>
+  </select>
+
+  <select id="queryForList" resultMap="BaseResultMap">
+    <include refid="base_cloum"/>
+    <include refid="base_table"/>
+    <include refid="base_where"/>
+    limit #{start},#{rows}
+  </select>
+
+  
+  <sql id="base_cloum">
+    select c.id, c.username, c.name, c.sn, c.carNumber, c.carExhaust, c.buyDate, c.marketPrice, c.classify,
+    c.carTyoe, c.remark
+  </sql>
+
+ 
+  <sql id="base_table">
+    from car c
+  </sql>
+
+
+  <sql id="base_where">
+    <where>
+      <if test="keyword != null">
+        and (c.name like concat('%',#{keyword},'%')
+            or c.carNumber like concat('%',#{keyword},'%')
+            or c.username like concat('%',#{keyword},'%'))
+      </if>
+    </where>
+  </sql>
+</mapper>

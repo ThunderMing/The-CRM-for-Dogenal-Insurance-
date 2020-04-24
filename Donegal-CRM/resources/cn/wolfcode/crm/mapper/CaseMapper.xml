@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CRM_Dogenal.Donegal_CRM.mapper.CaseMapper">
+  <resultMap id="BaseResultMap" type="CRM_Dogenal.Donegal_CRM.domain.Case">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="insurance_id" jdbcType="BIGINT" property="insuranceId" />
+    <result column="reporter" jdbcType="VARCHAR" property="reporter" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="caseTime" jdbcType="TIMESTAMP" property="caseTime" />
+    <result column="location" jdbcType="VARCHAR" property="location" />
+    <result column="carNumber" jdbcType="VARCHAR" property="carNumber" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="blame" jdbcType="BIT" property="blame" />
+    <result column="lossamount" jdbcType="DECIMAL" property="lossamount" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <association property="insurance" fetchType="eager" column="insurance_id"
+                 select="cn.wolfcode.crm.mapper.InsuranceMapper.selectByPrimaryKeyForCase" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from casebill
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id"  useGeneratedKeys="true">
+    insert into casebill (insurance_id, reporter, phone,
+      caseTime, location, carNumber, status, blame, lossamount, remark)
+    values (#{insuranceId}, #{reporter}, #{phone},
+      #{caseTime}, #{location}, #{carNumber},
+      #{status}, #{blame},#{lossamount},#{remark})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="cn.wolfcode.crm.domain.Case">
+    update casebill
+    set insurance_id = #{insuranceId,jdbcType=BIGINT},
+      reporter = #{reporter,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      caseTime = #{caseTime,jdbcType=TIMESTAMP},
+      location = #{location,jdbcType=VARCHAR},
+      carNumber = #{carNumber,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      blame = #{blame,jdbcType=BIT},
+      lossamount = #{lossamount,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="makeInvalidById">
+    update caseBill
+    set status = 5
+    where id = #{id}
+  </update>
+  <update id="checkUpdate" parameterType="case">
+    update casebill
+    set status = #{status,jdbcType=VARCHAR},
+      blame = #{blame,jdbcType=BIT},
+      lossamount = #{lossamount,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id}
+  </update>
+  <update id="makePassById">
+    update caseBill
+    set status = 3
+    where id = #{id}
+  </update>
+  <update id="makeNopayById">
+    update caseBill
+    set status = 6
+    where id = #{id}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, insurance_id, reporter, phone, caseTime, location, carNumber, status, blame, 
+    lossamount, remark
+    from casebill
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, insurance_id, reporter, phone, caseTime, location, carNumber, status, blame, 
+    lossamount, remark
+    from casebill
+  </select>
+
+  <select id="queryForCount" resultType="int" >
+    select count(*)
+    from casebill
+    <include refid="add_where"/>
+  </select>
+  <select id="queryForList" resultMap="BaseResultMap">
+    <include refid="base_column"/>
+    from casebill
+    <include refid="add_where"/>
+    order by ${sort} ${order}
+    limit #{start},#{rows}
+  </select>
+    <select id="queryForAuditCount" resultType="int">
+      select count(*)
+      from casebill
+      <include refid="audit_where"/>
+    </select>
+  <select id="queryForAuditList" resultMap="BaseResultMap">
+    <include refid="base_column"/>
+    from casebill
+    <include refid="audit_where"/>
+    order by ${sort} ${order}
+    limit #{start},#{rows}
+  </select>
+  <select id="queryForListCount" resultType="int">
+    select count(*)
+    from casebill
+    <include refid="list_where"/>
+  </select>
+  <select id="queryForListList" resultMap="BaseResultMap">
+    <include refid="base_column"/>
+    from casebill
+    <include refid="list_where"/>
+    order by ${sort} ${order}
+    limit #{start},#{rows}
+  </select>
+
+  <sql id="base_column">
+    select id, insurance_id, reporter, phone, caseTime, location, carNumber, status, blame,
+    lossamount, remark
+  </sql>
+
+  <sql id="base_where">
+    <where>
+      <if test="keyword != null">
+        and (insurance_id like concat('%',#{keyword},'%') or reporter like concat('%',#{keyword},'%'))
+      </if>
+      <if test="minDate != null">
+        and caseTime &gt;= #{minDate}
+      </if>
+      <if test="maxDate != null">
+        and caseTime &lt;= #{maxDate}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="add_where">
+    <where>
+      and status = 1 or status = 2
+      <if test="keyword != null">
+        and (insurance_id like concat('%',#{keyword},'%') or reporter like concat('%',#{keyword},'%'))
+      </if>
+      <if test="minDate != null">
+        and caseTime &gt;= #{minDate}
+      </if>
+      <if test="maxDate != null">
+        and caseTime &lt;= #{maxDate}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="audit_where">
+    <where>
+        and status = 2
+      <if test="keyword != null">
+        and (insurance_id like concat('%',#{keyword},'%') or reporter like concat('%',#{keyword},'%'))
+      </if>
+      <if test="minDate != null">
+        and caseTime &gt;= #{minDate}
+      </if>
+      <if test="maxDate != null">
+        and caseTime &lt;= #{maxDate}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="list_where">
+    <where>
+        and status = 3 or status = 6
+      <if test="keyword != null">
+        and (insurance_id like concat('%',#{keyword},'%') or reporter like concat('%',#{keyword},'%'))
+      </if>
+      <if test="minDate != null">
+        and caseTime &gt;= #{minDate}
+      </if>
+      <if test="maxDate != null">
+        and caseTime &lt;= #{maxDate}
+      </if>
+    </where>
+  </sql>
+
+</mapper>
